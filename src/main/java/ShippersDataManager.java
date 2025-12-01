@@ -27,7 +27,7 @@ public class ShippersDataManager {
 
             if(rows > 0){
                 System.out.println("New shipper was successfully added\n" +
-                        "Rows updated: " + rows);
+                        "Row(s) updated: " + rows);
             }
 
             try(ResultSet keys = ps.getGeneratedKeys()){
@@ -53,4 +53,52 @@ public class ShippersDataManager {
         }
     }
 
+    public void changeShipperInfo(int id, String newPhone){
+        String sql = "UPDATE shippers SET Phone = ? " +
+                "WHERE ShipperID = ?";
+
+        try(Connection conn = dataSource.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setString(1, newPhone);
+            ps.setInt(2, id);
+            int rows = ps.executeUpdate();
+            System.out.printf("Row(s) updated: %d%n", rows);
+
+            try(PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM shippers");
+                ResultSet rs = ps2.executeQuery()){
+                while(rs.next()){
+                    int shipperID = rs.getInt("ShipperID");
+                    String CompanyName = rs.getString("CompanyName");
+                    String Phone = rs.getString("Phone");
+                    System.out.printf("%d %s %s%n", shipperID, CompanyName, Phone);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteShipper(int id){
+        String sql = "DELETE FROM shippers " +
+                "WHERE ShipperID = ?";
+
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            System.out.printf("Row(s) deleted: %d%n", rows);
+
+            try(PreparedStatement ps2 = conn.prepareStatement("SELECT * FROM shippers");
+                ResultSet rs = ps2.executeQuery()){
+                while(rs.next()){
+                    int shipperID = rs.getInt("ShipperID");
+                    String CompanyName = rs.getString("CompanyName");
+                    String Phone = rs.getString("Phone");
+                    System.out.printf("%d %s %s%n", shipperID, CompanyName, Phone);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
